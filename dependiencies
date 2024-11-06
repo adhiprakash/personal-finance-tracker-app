@@ -1,0 +1,6 @@
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  firebase_auth: ^4.5.2 # optional for login
+  firebase_core: ^3.7.0
+  charts_flutter: ^0.13.1 # for data visualization
+  provider: ^6.0.5 # state management
