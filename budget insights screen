@@ -1,0 +1,52 @@
+import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
+
+class BudgetScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final box = Hive.box('expenses');
+    double monthlyTotal = box.values.fold(0, (sum, item) => sum + item['amount']);
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Monthly Summary')),
+      body: Column(
+        children: [
+          Text("Total Monthly Expense: \$$monthlyTotal"),
+          Expanded(
+            child: charts.PieChart(
+              _createChartData(box),
+              animate: true,
+              defaultRenderer: charts.ArcRendererConfig(arcWidth: 60),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pushNamed(context, '/setBudget'),
+            child: Text("Set Monthly Budget"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<charts.Series<Map<String, dynamic>, String>> _createChartData(Box box) {
+    var data = <Map<String, dynamic>>[];
+    box.values.forEach((expense) {
+      var category = expense['category'];
+      var amount = expense['amount'];
+      var item = data.firstWhere((d) => d['category'] == category, orElse: () => {'category': category, 'amount': 0.0});
+      item['amount'] += amount;
+      if (!data.contains(item)) data.add(item);
+    });
+
+    return [
+      charts.Series<Map<String, dynamic>, String>(
+        id: 'Expenses',
+        domainFn: (Map<String, dynamic> item, _) => item['category'],
+        measureFn: (Map<String, dynamic> item, _) => item['amount'],
+        data: data,
+        labelAccessorFn: (Map<String, dynamic> item, _) => '${item['category']}: \$${item['amount']}',
+      )
+    ];
+  }
+}
