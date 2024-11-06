@@ -1,0 +1,29 @@
+import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+
+class SetBudgetScreen extends StatelessWidget {
+  final _budgetController = TextEditingController();
+
+  void _setBudget() {
+    final box = Hive.box('budget');
+    box.put('monthlyBudget', double.parse(_budgetController.text));
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Set Monthly Budget')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(controller: _budgetController, decoration: InputDecoration(labelText: 'Monthly Budget'), keyboardType: TextInputType.number),
+            SizedBox(height: 20),
+            ElevatedButton(onPressed: _setBudget, child: Text('Set Budget')),
+          ],
+        ),
+      ),
+    );
+  }
+}
